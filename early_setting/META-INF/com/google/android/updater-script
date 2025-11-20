@@ -1,8 +1,8 @@
 ui_print (" ");
 ui_print ("*******************************");
-ui_print ("*    - GoRhanHee Kernel -     *");
+ui_print ("*      - SMURF KERNEL-        *");
 ui_print ("*       TWRP Installer        *");
-ui_print ("*       by @GoRhanHee         *");
+ui_print ("*   COMPILED BY @PAPAL3XA     *");
 ui_print ("*******************************");
 
 ui_print ("Installing boot.img...");
@@ -12,5 +12,6 @@ package_extract_file("dt.img", "/dev/block/by-name/dtb");
 ui_print ("Installing dtbo.img...");
 package_extract_file("dtbo.img", "/dev/block/by-name/dtbo");
 
-ui_print("Installation Completed. Go to Reboot!");
+ui_print("Installation Completed...");
+ui_print("It's Time to Reboot! ");
 ui_print(" ");

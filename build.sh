@@ -1,6 +1,7 @@
 #!/bin/bash
 
 MODEL=$(echo "$1" | tr '[:lower:]' '[:upper:]')
+BUILD_KERNEL_VERSION="$2"
 
 case "$MODEL" in
     G970F )
@@ -62,6 +63,19 @@ case "${MODEL}" in
         ;;            
 esac
 
+# submodule
+git submodule init && git submodule update --remote
+
+# Setting toolchain
+TOOLCHAIN_URL="https://github.com/GoRhanHee/exynos9820_toolchain/releases/download/toolchain/toolchain.tar.xz"
+TOOLCHAIN_FILE=$(basename "$TOOLCHAIN_URL")
+
+if [ ! -f "$TOOLCHAIN_FILE" ]; then
+    wget -q --show-progress -O "$TOOLCHAIN_FILE" "$TOOLCHAIN_URL"
+fi
+
+tar -xf "$TOOLCHAIN_FILE" && rm "$TOOLCHAIN_FILE"
+
 # Compile Setting (OEM Option)
 export ARCH=arm64
 export PLATFORM_VERSION=12
@@ -75,12 +89,12 @@ else
     mkdir -p "$OUT_DIR"
 fi
 
-GORHANHEE="$(pwd)/gorhanhee"
+PAPA="$(pwd)/papa"
 
-if [ -d "$GORHANHEE" ]; then
-    rm -rf "$GORHANHEE"/*
+if [ -d "$PAPA" ]; then
+    rm -rf "$PAPA"/*
 else
-    mkdir -p "$GORHANHEE"
+    mkdir -p "$PAPA"
 fi
 
 AIK_DIR="$(pwd)/AIK"
@@ -98,14 +112,19 @@ find . | cpio -o -H newc | gzip > ../split_img/boot.img-ramdisk.cpio.gz
 cd "${LOCATION}"
 
 # Make file
-make ARCH=arm64 -j32 O=${OUT_DIR} mrproper
-make ARCH=arm64 -j32 O=${OUT_DIR} exynos9820-${DEVICE}_defconfig gorhanhee.config || exit 1
-make ARCH=arm64 -j32 O=${OUT_DIR} || exit 1
+make ARCH=arm64 -j$(nproc --all) O=${OUT_DIR} mrproper
+make ARCH=arm64 -j$(nproc --all) O=${OUT_DIR} exynos9820-${DEVICE}_defconfig papa.config ksu.config || exit 1
+make ARCH=arm64 -j$(nproc --all) O=${OUT_DIR} || exit 1
 
 IMAGE="$(pwd)/out/arch/arm64/boot/Image"
 
+# Check if Image file exists
+if [ ! -f "$IMAGE" ]; then
+    echo "Error: Kernel Image not found at $IMAGE"
+    exit 1
+fi
+
 # Make boot.img file
-	
 cp "${IMAGE}" "${AIK_DIR}/split_img/boot.img-kernel"
 
 BOARD="${AIK_DIR}/split_img/boot.img-board"
@@ -156,7 +175,7 @@ cd "${AIK_DIR}"
 ./repackimg.sh
 
 cd "${LOCATION}"
-mv "${AIK_DIR}/image-new.img" "${GORHANHEE}/boot.img"
+mv "${AIK_DIR}/image-new.img" "${PAPA}/boot.img"
 
 # Make dt.img file
 cd "${LOCATION}"
@@ -176,7 +195,7 @@ case "${MODEL}" in
   	${OUT_DIR}/arch/arm64/boot/dts/exynos/exynos9825.dtb --custom0=0x00 --custom1=0xff --id=0x0 --rev=0x0 
         ;;              
 esac
-mv "dt.img" "${GORHANHEE}/dt.img"
+mv "dt.img" "${PAPA}/dt.img"
 
 # Make dtbo.img file
 cd "${LOCATION}"
@@ -361,21 +380,27 @@ case "${MODEL}" in
   	${OUT_DIR}/arch/arm64/boot/dts/samsung/exynos9820-d2x_kor_24.dtbo --custom0=0x18 --custom1=0xff --id=0x0 --rev=0x0
         ;;        
 esac
-mv "dtbo.img" "${GORHANHEE}/dtbo.img"
+mv "dtbo.img" "${PAPA}/dtbo.img"
 
 # Make tar_file for Odin
-cd ${GORHANHEE}
+cd ${PAPA}
 
-tar -cvf ${MODEL}_Odin_ramdisk.tar boot.img dt.img dtbo.img
+tar -cvf SmurfKernel_${MODEL}_${BUILD_KERNEL_VERSION}_Odin_KSUN.tar boot.img dt.img dtbo.img
 
 # Make zip_file for TWRP
 cd "${LOCATION}"
-cp -ar "$(pwd)/early_setting/META-INF" "${GORHANHEE}/META-INF"
+cp -ar "$(pwd)/early_setting/META-INF" "${PAPA}/META-INF"
 
-cd ${GORHANHEE}
+cd ${PAPA}
 
-zip -r ${MODEL}_TWRP_ramdisk.zip META-INF boot.img dt.img dtbo.img
+zip -r SmurfKernel_${MODEL}_${BUILD_KERNEL_VERSION}_TWRP_KSUN.zip META-INF boot.img dt.img dtbo.img
 
+# Cleanup
 rm -rf ${AIK_DIR}/split_img/boot.img-kernel
 rm -rf ${AIK_DIR}/split_img/boot.img-ramdisk.cpio.gz
 rm -rf ${AIK_DIR}/ramdisk-new.cpio.gz
+
+echo "✅ Build completed for $MODEL"
+echo "📦 Output files:"
+echo "   - ${PAPA}/SmurfKernel_${MODEL}_${BUILD_KERNEL_VERSION}_Odin_KSUN.tar"
+echo "   - ${PAPA}/SmurfKernel_${MODEL}_${BUILD_KERNEL_VERSION}_TWRP_KSUN.zip"
