@@ -1,4 +1,5 @@
-name: Kernel All Build (KernelSU-Next)
+name: Kernel All Build (KernelSU-Next)-New
+run-name: 'Release: Build SmurfKernel_v.${{ github.event.inputs.version }}_KSUN-S/N 10series'
 
 on:
   workflow_dispatch:
@@ -34,10 +35,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: 1. Checkout kernel source
+    - name: Checkout repository with submodules
       uses: actions/checkout@v4
+      with:
+        submodules: true
 
-    - name: 2. Install build dependencies
+    - name: Set Time Zone to Asia
+      run: |
+        sudo timedatectl set-timezone "Asia/Singapore"
+        
+    - name: Install build dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y \
@@ -45,40 +52,47 @@ jobs:
           libncurses5-dev libncurses-dev cpio zip unzip \
           python3 curl rsync kmod libelf-dev \
           lz4 tar openssl python3-pip \
-          gcc clang lzop
-        # Install libtinfo5 untuk kompatibilitas
-        wget -q http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb && sudo dpkg -i libtinfo5_6.3-2ubuntu0.1_amd64.deb
-        sudo apt-get install -f -y)
+          gcc clang
+        wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb && sudo dpkg -i libtinfo5_6.3-2ubuntu0.1_amd64.deb
 
-    - name: 3. Set current date
-      id: date
+    - name: Set build timestamp
+      id: timestamp
       run: |
-        echo "::set-output name=date::$(date +'%Y-%m-%d %H:%M:%S')"
-        # Your build commands here
-        echo "Build completed at ${{ steps.date.outputs.date }}"
+        echo "BUILD_KERNEL_VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+        echo "BUILD_TIME=$(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+        echo "BUILD_TIME_ISO=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+        echo "TIME=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
 
-    - name: 4. Build kernel
+    
+    - name: Set build Environment
       run: |
-        chmod +x build.sh
-        echo "Starting build for ${{ matrix.model }}"
-        echo "Kernel version: ${{ github.event.inputs.version }}"
+        echo "BUILD_KERNEL_VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+
+    - name: Build kernel
+      shell: bash
+      run: |
+        chmod +x buildnew.sh
+        echo "🚀 Starting build for ${{ matrix.model }}"
+        echo "📋 Kernel version: ${{ env.BUILD_KERNEL_VERSION }}"
+        echo "🕒 Build time: ${{ env.BUILD_TIME }}"
         
-        # Build dengan parameter model dari matrix
-        ./build.sh "${{ matrix.model }}"
+        # Kirim kedua parameter: model dan version
+        ./buildnew.sh -m "${{ matrix.model }}" -v "${{ env.BUILD_KERNEL_VERSION }}"
 
-    - name: 5. Upload kernel artifacts
+    - name: Upload kernel artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ matrix.model }}_KernelSU-Next_${{ github.event.inputs.version }}
+        name: ${{ matrix.model }}_KernelSU-Next_${{ env.BUILD_KERNEL_VERSION }}_${{ env.TIME }}
         path: |
           papa/*.zip
           papa/*.tar
         retention-days: 7
 
-    - name: 6. Build summary
+    - name: Build summary
       run: |
         echo "✅ Build completed for ${{ matrix.model }}"
-        echo "📦 Artifacts uploaded: ${{ matrix.model }}_KernelSU-Next_${{ github.event.inputs.version }}"
+        echo "📦 Artifacts uploaded: ${{ matrix.model }}_KernelSU-Next_${{ env.BUILD_KERNEL_VERSION }}_${{ env.TIME }}"
+        echo "🕒 Build time: ${{ env.BUILD_TIME }}"
 
   release:
     name: Create Release
@@ -87,6 +101,11 @@ jobs:
     if: github.event.inputs.version != ''
     
     steps:
+    - name: Set release timestamp
+      id: release_time
+      run: |
+        echo "RELEASE_TIME=$(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+        
     - name: Download all artifacts
       uses: actions/download-artifact@v4
       with:
@@ -120,7 +139,7 @@ jobs:
           - N975F, N976B, N976N
           
           ## Build Information:
-          - Build Date: ${{ steps.date.outputs.date }}
+          - Build Date: ${{ env.RELEASE_TIME }}
           - Commit: ${{ github.sha }}
           - Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.version }}
           - Version: ${{ github.event.inputs.version }}
@@ -137,4 +156,5 @@ jobs:
         echo "🎉 Release created successfully!"
         echo "📝 Release Name: SmurfKernel ${{ github.event.inputs.version }}"
         echo "🏷️ Tag: ${{ github.event.inputs.version }}"
+        echo "🕒 Release Time: ${{ env.RELEASE_TIME }}"
         echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.version }}"

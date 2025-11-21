@@ -1,4 +1,5 @@
-name: Kernel Build (ksun) 
+name: Kernel Build (ksun) - New
+run-name: 'Release: Build for ${{ github.event.inputs.MODEL }}_v.${{ github.event.inputs.version }}_KSUN'
 
 on:
   workflow_dispatch:
@@ -7,6 +8,7 @@ on:
         description: 'Choose Your Device'
         required: true
         type: choice
+        default: 'N970F'
         options:
           - G970F
           - G970N
@@ -31,10 +33,14 @@ jobs:
     runs-on: ubuntu-latest 
 
     steps:
-    - name: 1. import kernel source
+    - name: Update kernel source
       uses: actions/checkout@v4       
-        
-    - name: 2. install package
+
+    - name: Set Time Zone to Asia
+      run: |
+        sudo timedatectl set-timezone "Asia/Singapore"
+
+    - name: Install Environemental package
       run: |
         sudo apt-get update
         sudo apt-get install -y \
@@ -45,19 +51,22 @@ jobs:
           gcc clang
         wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb && sudo dpkg -i libtinfo5_6.3-2ubuntu0.1_amd64.deb   
 
-    - name: 3. setting permission
-      run: chmod +x build.sh
-
-    - name: 4. kernel build
+    - name: Set build Environment
       run: |
-        echo "Starting build for ${{ github.event.inputs.MODEL }}_Kernel File"
-    
-        ./build.sh "${{ github.event.inputs.MODEL }}"
+        echo "BUILD_KERNEL_VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+
+    - name: Kernel build
+      run: |
+        chmod +x buildnew.sh
+        echo "📋 Kernel version: ${{ env.BUILD_KERNEL_VERSION }}"
         
-    - name: 5. Upload Artifacts Kernel File
+        # Kirim kedua parameter: model dan version
+        ./buildnew.sh -m "${{ github.event.inputs.MODEL }}" -v "${{ env.BUILD_KERNEL_VERSION }}"
+        
+    - name: Upload Artifacts Kernel File
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ github.event.inputs.MODEL }}_KernelSU-Next_${{ github.event.inputs.version }}
+        name: SmurfKernel_${{ github.event.inputs.MODEL }}_${{ github.event.inputs.version }}_KernelSU-Next
         path: |
           papa/*.zip  
           papa/*.tar   
