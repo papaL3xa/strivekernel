@@ -71,13 +71,13 @@ jobs:
     - name: Build kernel
       shell: bash
       run: |
-        chmod +x buildnew.sh
+        chmod +x build.sh
         echo "🚀 Starting build for ${{ matrix.model }}"
         echo "📋 Kernel version: ${{ env.BUILD_KERNEL_VERSION }}"
         echo "🕒 Build time: ${{ env.BUILD_TIME }}"
         
         # Kirim kedua parameter: model dan version
-        ./buildnew.sh -m "${{ matrix.model }}" -v "${{ env.BUILD_KERNEL_VERSION }}"
+        ./build.sh -m "${{ matrix.model }}" -v "${{ env.BUILD_KERNEL_VERSION }}"
 
     - name: Upload kernel artifacts
       uses: actions/upload-artifact@v4

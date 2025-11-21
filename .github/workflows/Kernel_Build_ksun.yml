@@ -57,11 +57,11 @@ jobs:
 
     - name: Kernel build
       run: |
-        chmod +x buildnew.sh
+        chmod +x build.sh
         echo "📋 Kernel version: ${{ env.BUILD_KERNEL_VERSION }}"
         
         # Kirim kedua parameter: model dan version
-        ./buildnew.sh -m "${{ github.event.inputs.MODEL }}" -v "${{ env.BUILD_KERNEL_VERSION }}"
+        ./build.sh -m "${{ github.event.inputs.MODEL }}" -v "${{ env.BUILD_KERNEL_VERSION }}"
         
     - name: Upload Artifacts Kernel File
       uses: actions/upload-artifact@v4

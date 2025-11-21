@@ -287,7 +287,7 @@ setup_localversion() {
     
     KERNEL_DEFCONFIG="exynos9820-${DEVICE}_defconfig"
     local defconfig="${RDIR}/arch/arm64/configs/${KERNEL_DEFCONFIG}"
-    local localversion="-SmurfKernel_${MODEL}-${BUILD_KERNEL_VERSION}-A${PLATFORM_VERSION}"
+    local localversion="-SmurfKernel-${MODEL}-${BUILD_KERNEL_VERSION}-A${PLATFORM_VERSION}"
     
     # Check if defconfig exists
     if [[ ! -f "$defconfig" ]]; then
