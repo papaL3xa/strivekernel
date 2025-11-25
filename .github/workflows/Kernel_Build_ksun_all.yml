@@ -9,9 +9,6 @@ on:
         required: true
         default: ''
 
-env:
-  BUILD_KERNEL_VERSION: ${{ github.event.inputs.version }}
-
 jobs:
   build:
     strategy:
@@ -35,15 +32,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository with submodules
+    - name: Update kernel source
       uses: actions/checkout@v4
-    
 
     - name: Set Time Zone to Asia
       run: |
         sudo timedatectl set-timezone "Asia/Singapore"
         
-    - name: Install build dependencies
+    - name: Install Environemental package
       run: |
         sudo apt-get update
         sudo apt-get install -y \
@@ -62,13 +58,11 @@ jobs:
         echo "BUILD_TIME_ISO=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
         echo "TIME=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
 
-    
     - name: Set build Environment
       run: |
         echo "BUILD_KERNEL_VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
 
     - name: Build kernel
-      shell: bash
       run: |
         chmod +x build.sh
         echo "🚀 Starting build for ${{ matrix.model }}"
@@ -76,7 +70,7 @@ jobs:
         echo "🕒 Build time: ${{ env.BUILD_TIME }}"
         
         # Kirim kedua parameter: model dan version
-        ./build.sh -m "${{ matrix.model }}" -v "${{ env.BUILD_KERNEL_VERSION }}"
+        ./build.sh -m "${{ github.event.inputs.MODEL }}" -v "${{ env.BUILD_KERNEL_VERSION }}"
 
     - name: Upload kernel artifacts
       uses: actions/upload-artifact@v4
@@ -165,27 +159,36 @@ jobs:
           artifacts/**/*.zip
           artifacts/**/*.tar
 
-    - name: Upload to Telegram
+    - name: Send Telegram Notification
       uses: appleboy/telegram-action@master
       with:
         to: ${{ secrets.TELEGRAM_CHAT_ID }}
         token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        document: artifacts/**/*.zip
         format: html
         disable_web_page_preview: false
         message: |
-          <b>New Kernel Build Released! 🎉</b>
+          <b>🚀 New Kernel Build Released! 🎉</b>
           
-          <b>Kernel Version:</b> ${{ github.event.inputs.version }}
-          <b>Build Date:</b> ${{ env.RELEASE_TIME }}
-          <b>Supported Devices:</b> Galaxy S10/Note10 Series
+          <b>📋 Kernel Version:</b> <code>${{ github.event.inputs.version }}</code>
+          <b>📅 Build Date:</b> <code>${{ env.RELEASE_TIME }}</code>
+          <b>📱 Supported Devices:</b> Galaxy S10/Note10 Series
           
-          <b>Repository:</b> <a href="https://github.com/${{ github.repository }}">${{ github.repository }}</a>
-          <b>Release:</b> <a href="https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.version }}">Download Here</a>
+          <b>📚 Repository:</b> <a href="https://github.com/${{ github.repository }}">${{ github.repository }}</a>
+          <b>⬇️ Release:</b> <a href="https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.version }}">Download from GitHub Releases</a>
           
-          <b>Commit:</b> <a href="https://github.com/${{ github.repository }}/commit/${{github.sha}}">${{ github.sha }}</a>
+          <b>🔗 Commit:</b> <a href="https://github.com/${{ github.repository }}/commit/${{github.sha}}">${{ github.sha }}</a>
+          
+          <b>📊 Build Summary:</b>
+          • G970F, G970N
+          • G973F, G973N  
+          • G975F, G975N
+          • G977B, G977N
+          • N970F, N971N
+          • N975F, N976B, N976N
           
           ⚠️ <b>Flash at your own risk!</b> ⚠️
+          
+          <i>File tersedia di GitHub Releases, tidak diupload ke Telegram</i>
 
     - name: Release Summary
       run: |
@@ -194,4 +197,4 @@ jobs:
         echo "🏷️ Tag: ${{ github.event.inputs.version }}"
         echo "🕒 Release Time: ${{ env.RELEASE_TIME }}"
         echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.version }}"
-        echo "📱 Telegram notification sent!"
+        echo "📱 Telegram notification sent (message only, no file upload)"
