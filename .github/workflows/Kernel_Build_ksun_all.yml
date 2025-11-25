@@ -70,7 +70,7 @@ jobs:
         echo "🕒 Build time: ${{ env.BUILD_TIME }}"
         
         # Kirim kedua parameter: model dan version
-        ./build.sh -m "${{ github.event.inputs.MODEL }}" -v "${{ env.BUILD_KERNEL_VERSION }}"
+        ./build.sh -m "${{ matrix.model }}" -v "${{ env.BUILD_KERNEL_VERSION }}"
 
     - name: Upload kernel artifacts
       uses: actions/upload-artifact@v4
