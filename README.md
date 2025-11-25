@@ -42,11 +42,17 @@ git clone https://github.com/papaL3xa/smurfkernel.git
 > ```
 
 3. Output will place in FOLDER "papa"
-4. Flash using TWRP based recovery for SmurfKernel_[device_codename]_[kernel_version]_TWRP_KSUN.zip
-5. Flash using ODIN for SmurfKernel_[device_codename]_[kernel_version]_ODIN_KSUN.tar
-
-6. Test it and enjoy!
+4. Flash using TWRP based recovery for
+   ```
+   SmurfKernel_[device_codename]_[kernel_version]_TWRP_KSUN.zip
+   ```
+6. Flash using ODIN for
+   ```
+   SmurfKernel_[device_codename]_[kernel_version]_ODIN_KSUN.tar
+   ```
+8. Test it and enjoy!
    
 # Credits
 
 - [`GoRhanHee`](https://github.com/GoRhanHee) for [KernelSources & KSUN](https://github.com/GoRhanHee/exynos9820_samsung_Kernel)
+
