@@ -21,8 +21,32 @@
 |   Galaxy Note10+  |     d2s    | SM-N975F/N |     ✅    |
 | Galaxy Note10+ 5G |     d2x    | SM-N976B/N |     ✅    |
 
+# How to Build
+
+1. Clone this repository
+
+```
+git clone https://github.com/papaL3xa/smurfkernel.git
+```
+
+2. Build for your device (To list all build script command run `./build.sh -h`)
+
+```
+./build.sh -m [device_codename] -v [kernel_version]
+```
+
+> **Example:** Build for Galaxy S10+
+> 
+> ```
+> ./build.sh -m G975F -v 1.0.0
+> ```
+
+3. Output will place in FOLDER "papa"
+4. Flash using TWRP based recovery for SmurfKernel_[device_codename]_[kernel_version]_TWRP_KSUN.zip
+5. Flash using ODIN for SmurfKernel_[device_codename]_[kernel_version]_ODIN_KSUN.tar
+
+6. Test it and enjoy!
+   
 # Credits
 
-- [`rifsxd`](https://github.com/rifsxd) for [KernelSU Next](https://github.com/KernelSU-Next/KernelSU-Next)
-- [`evdenis`](https://github.com/evdenis) for [CruelKernel](https://github.com/CruelKernel/samsung-exynos9820)
-- [`GoRhanHee`](https://github.com/GoRhanHee) for [KernelSources](https://github.com/GoRhanHee/exynos9820_samsung_Kernel)
+- [`GoRhanHee`](https://github.com/GoRhanHee) for [KernelSources & KSUN](https://github.com/GoRhanHee/exynos9820_samsung_Kernel)
