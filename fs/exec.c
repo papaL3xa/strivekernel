@@ -2013,6 +2013,10 @@ static int do_execveat_common(int fd, struct filename *filename,
 	struct files_struct *displaced;
 	int retval;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> b6fa74c0fd5c (fs/kernel: update manual hooks to v1.6)
 	if (IS_ERR(filename))
 		return PTR_ERR(filename);
 
@@ -2171,7 +2175,7 @@ out_ret:
 	return retval;
 }
 
-#if defined(CONFIG_KSU) && !defined(CONFIG_KSU_SUSFS)
+#ifdef CONFIG_KSU
 __attribute__((hot))
 extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr,
 				void *argv, void *envp, int *flags);
@@ -2183,7 +2187,7 @@ int do_execve(struct filename *filename,
 {
 	struct user_arg_ptr argv = { .ptr.native = __argv };
 	struct user_arg_ptr envp = { .ptr.native = __envp };
-#if defined(CONFIG_KSU) && !defined(CONFIG_KSU_SUSFS)
+#ifdef CONFIG_KSU
 	ksu_handle_execveat((int *)AT_FDCWD, &filename, &argv, &envp, 0);
 #endif
 	return do_execveat_common(AT_FDCWD, filename, argv, envp, 0);
@@ -2213,7 +2217,7 @@ static int compat_do_execve(struct filename *filename,
 		.is_compat = true,
 		.ptr.compat = __envp,
 	};
-#if defined(CONFIG_KSU) && !defined(CONFIG_KSU_SUSFS) // 32-bit ksud and 32-on-64 support
+#ifdef CONFIG_KSU // 32-bit ksud and 32-on-64 support
 	ksu_handle_execveat((int *)AT_FDCWD, &filename, &argv, &envp, 0);
 #endif
 	return do_execveat_common(AT_FDCWD, filename, argv, envp, 0);

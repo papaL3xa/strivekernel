@@ -361,15 +361,10 @@ SYSCALL_DEFINE4(fallocate, int, fd, int, mode, loff_t, offset, loff_t, len)
 	return error;
 }
 
-#if defined(CONFIG_KSU) && !defined(CONFIG_KSU_SUSFS)
+#ifdef CONFIG_KSU
 __attribute__((hot)) 
 extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user,
 				int *mode, int *flags);
-#endif
-#ifdef CONFIG_KSU_SUSFS
-extern bool __ksu_is_allow_uid_for_current(uid_t uid);
-extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int *mode,
-			int *flags);
 #endif
 
 /*
