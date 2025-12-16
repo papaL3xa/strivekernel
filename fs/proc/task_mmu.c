@@ -23,9 +23,6 @@
 #include <linux/io_record.h>
 #include <linux/freezer.h>
 #include <linux/pkeys.h>
-#if defined(CONFIG_KSU_SUSFS_SUS_KSTAT) || defined(CONFIG_KSU_SUSFS_SUS_MAP)
-#include <linux/susfs_def.h>
-#endif
 
 #include <asm/elf.h>
 #include <asm/tlb.h>
