@@ -297,7 +297,7 @@ setup_localversion() {
     
     KERNEL_DEFCONFIG="exynos9820-${DEVICE}_defconfig"
     local defconfig="${RDIR}/arch/arm64/configs/${KERNEL_DEFCONFIG}"
-    local localversion="-SmurfKernel-${MODEL}-${BUILD_KERNEL_VERSION}-A${PLATFORM_VERSION}"
+    local localversion="-StriveKernel-${MODEL}-${BUILD_KERNEL_VERSION}-A${PLATFORM_VERSION}"
     
     # Check if defconfig exists
     if [[ ! -f "$defconfig" ]]; then
@@ -658,7 +658,7 @@ create_odin_package() {
         exit 1
     fi
     
-    if ! tar -cvf "SmurfKernel_${MODEL}_${BUILD_KERNEL_VERSION}_Odin_KSUN.tar" boot.img dt.img dtbo.img; then
+    if ! tar -cvf "StriveKernel_${MODEL}_${BUILD_KERNEL_VERSION}_Odin_KSUN.tar" boot.img dt.img dtbo.img; then
         log_error "Failed to create Odin package"
         exit 1
     fi
@@ -685,7 +685,7 @@ create_twrp_package() {
         exit 1
     fi
     
-    if ! zip -r "SmurfKernel_${MODEL}_${BUILD_KERNEL_VERSION}_TWRP_KSUN.zip" META-INF boot.img dt.img dtbo.img; then
+    if ! zip -r "StriveKernel_${MODEL}_${BUILD_KERNEL_VERSION}_TWRP_KSUN.zip" META-INF boot.img dt.img dtbo.img; then
         log_error "Failed to create TWRP package"
         exit 1
     fi
@@ -754,8 +754,8 @@ main() {
     echo ""
     log_success "Build completed successfully! 🎉"
     echo "📦 Output files in ${PAPA_DIR}/:"
-    echo "   - SmurfKernel_${MODEL}_${BUILD_KERNEL_VERSION}_Odin_KSUN.tar"
-    echo "   - SmurfKernel_${MODEL}_${BUILD_KERNEL_VERSION}_TWRP_KSUN.zip"
+    echo "   - StriveKernel_${MODEL}_${BUILD_KERNEL_VERSION}_Odin_KSUN.tar"
+    echo "   - StriveKernel_${MODEL}_${BUILD_KERNEL_VERSION}_TWRP_KSUN.zip"
     echo ""
     log_info "Model: $MODEL | Device: $DEVICE | Version: $BUILD_KERNEL_VERSION"
 }
