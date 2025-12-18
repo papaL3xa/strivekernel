@@ -72,7 +72,7 @@ jobs:
     - name: Upload Artifacts Kernel File
       uses: actions/upload-artifact@v4
       with:
-        name: SmurfKernel_${{ github.event.inputs.MODEL }}_${{ github.event.inputs.version }}_KernelSU-Next
+        name: StriveKernel_${{ github.event.inputs.MODEL }}_${{ github.event.inputs.version }}_KernelSU-Next
         path: |
           papa/*.zip  
           papa/*.tar   

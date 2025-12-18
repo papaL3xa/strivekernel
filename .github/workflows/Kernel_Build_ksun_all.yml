@@ -62,6 +62,10 @@ jobs:
       run: |
         echo "BUILD_KERNEL_VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
 
+    - name: Update KernelSU
+      run: |
+        chmod +x update_kernelsu.sh
+        
     - name: Build kernel
       run: |
         chmod +x build.sh
