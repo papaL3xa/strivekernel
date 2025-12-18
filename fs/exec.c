@@ -2013,10 +2013,6 @@ static int do_execveat_common(int fd, struct filename *filename,
 	struct files_struct *displaced;
 	int retval;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> b6fa74c0fd5c (fs/kernel: update manual hooks to v1.6)
 	if (IS_ERR(filename))
 		return PTR_ERR(filename);
 
