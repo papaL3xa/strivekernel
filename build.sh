@@ -22,14 +22,14 @@ DEFAULT_KERNEL_VERSION="unknown"
 # =============================================================================
 
 # Fungsi untuk update submodules
-submodule() {
-    separator
-    quotes "Fetch all Submodules Update"
+#submodule() {
+#    separator
+#    quotes "Fetch all Submodules Update"
 
-    git submodule init && git submodule update --remote
-    git submodule update -f -q --init --recursive > /dev/null
-    check "Submodules"
-}
+#    git submodule init && git submodule update --remote
+#    git submodule update -f -q --init --recursive > /dev/null
+#    check "Submodules"
+#}
 
 # Fungsi untuk menampilkan usage
 usage() {
